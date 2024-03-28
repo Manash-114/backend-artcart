@@ -44,7 +44,7 @@ public class AuthController {
 
     }
 
-    @GetMapping("/signin")
+    @PostMapping("/signin")
     public ResponseEntity<AuthResponse> singInhanlder(@RequestBody SignInRequest signInRequest){
         String email = signInRequest.getEmail();
         String password = signInRequest.getPassword();

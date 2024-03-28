@@ -65,4 +65,11 @@ public class GlobalExceptionHandler {
         errorDetails.setProperty("message","Access-Denied");
         return  errorDetails;
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ProblemDetail resourceNotFoundHandler(ResourceNotFoundException e){
+        ProblemDetail errorDetails = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND,e.getMessage());
+        errorDetails.setProperty("message",e.getMessage());
+        return  errorDetails;
+    }
 }

@@ -29,8 +29,8 @@ public class SellerController {
     private SellerRepo sellerRepo;
     private CloudinaryImageUpload cloudinaryImageUpload;
     private ObjectMapper objectMapper;
-
     private Logger logger = LoggerFactory.getLogger(SellerController.class);
+
     public SellerController(SellerService sellerService , JwtTokenProvider jwtTokenProvider,SellerRepo sellerRepo,
     CloudinaryImageUpload cloudinaryImageUpload,ObjectMapper objectMapper){
         this.sellerService =sellerService;

@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Table(name = "seller_table")
 public class Seller {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
