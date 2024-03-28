@@ -3,25 +3,21 @@ package com.artcart.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Table(name = "category_table")
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Category {
+public class ProductImage {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private String id;
     private String name;
-    @OneToMany(mappedBy = "category")
+    @ManyToMany(mappedBy = "productImages")
     @JsonBackReference
     private List<Product> products;
 }
