@@ -1,6 +1,7 @@
 package com.artcart.services.impl;
 
 import com.artcart.exception.ResourceNotFoundException;
+import com.artcart.model.Customer;
 import com.artcart.model.Product;
 import com.artcart.model.Review;
 import com.artcart.repository.ProductRepo;
@@ -23,14 +24,20 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void addReview(String productId, ReviewReq reviewReq) {
+    public void addReview(String productId, Customer customer , ReviewReq reviewReq) {
         Product product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("product not found with id " + productId));
+
+        Review byCustomer = reviewRepo.findByCustomerAndProduct(customer,product);
+        if(byCustomer != null){
+            throw new ResourceNotFoundException("review found ");
+        }
         Review review = new Review();
         review.setId(UUID.randomUUID().toString());
         review.setContent(reviewReq.getContent());
         review.setRating(reviewReq.getRating());
         review.setProduct(product);
         review.setRegDate(LocalDateTime.now());
+        review.setCustomer(customer);
         reviewRepo.save(review);
     }
     @Override

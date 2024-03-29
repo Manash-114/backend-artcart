@@ -1,7 +1,9 @@
 package com.artcart.controller;
 
 import com.artcart.config.JwtTokenProvider;
+import com.artcart.model.Customer;
 import com.artcart.model.Seller;
+import com.artcart.repository.CustomerRepo;
 import com.artcart.request.ReviewReq;
 import com.artcart.request.UpdateProduct;
 import com.artcart.response.ProductReqDto;
@@ -32,13 +34,15 @@ public class ProductController {
     private ModelMapper modelMapper;
 
     private ReviewService reviewService;
+    private CustomerRepo customerRepo;
 
-    public ProductController(ProductService productService, SellerService sellerService, JwtTokenProvider jwtTokenProvider, ModelMapper modelMapper, ReviewService reviewService) {
+    public ProductController(ProductService productService, SellerService sellerService, JwtTokenProvider jwtTokenProvider, ModelMapper modelMapper, ReviewService reviewService, CustomerRepo customerRepo) {
         this.productService = productService;
         this.sellerService = sellerService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.modelMapper = modelMapper;
         this.reviewService = reviewService;
+        this.customerRepo = customerRepo;
     }
 
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
@@ -87,14 +91,18 @@ public class ProductController {
     }
 
     @PostMapping("/review/{id}")
-    public ResponseEntity<?> giveReview(@PathVariable String id , @RequestBody ReviewReq reviewReq){
-        reviewService.addReview(id,reviewReq);
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
+    public ResponseEntity<?> giveReview(@PathVariable String id , @RequestHeader("Authorization") String token , @RequestBody ReviewReq reviewReq) throws Exception {
+        String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
+        Customer byEmail = customerRepo.findByEmail(emailFromToken);
+        reviewService.addReview(id,byEmail,reviewReq);
         Map<String,String> res = new HashMap<>();
         res.put("message","Review added successfully");
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
 
     @DeleteMapping("/review/{id}")
+    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
     public ResponseEntity<?> giveReview(@PathVariable String id){
         reviewService.deleteReview(id);
         Map<String,String> res = new HashMap<>();

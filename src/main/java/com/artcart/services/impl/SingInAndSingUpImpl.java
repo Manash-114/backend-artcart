@@ -1,8 +1,10 @@
 package com.artcart.services.impl;
 
 
+import com.artcart.model.Customer;
 import com.artcart.model.Seller;
 import com.artcart.model.SingInAndSingUp;
+import com.artcart.repository.CustomerRepo;
 import com.artcart.repository.SellerRepo;
 import com.artcart.repository.SingInAndSingUpRepo;
 import com.artcart.request.SignUpRequest;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class SingInAndSingUpImpl implements SingInAndSingUpService {
@@ -26,14 +29,16 @@ public class SingInAndSingUpImpl implements SingInAndSingUpService {
     private CustomUserService customUserService;
 
     private SellerRepo sellerRepo;
+    private CustomerRepo customerRepo;
 
-    public SingInAndSingUpImpl (SingInAndSingUpRepo singInAndSingUpRepo,PasswordEncoder passwordEncoder ,
-                                CustomUserService customUserService,SellerRepo sellerRepo){
+    public SingInAndSingUpImpl(SingInAndSingUpRepo singInAndSingUpRepo, PasswordEncoder passwordEncoder, CustomUserService customUserService, SellerRepo sellerRepo, CustomerRepo customerRepo) {
         this.singInAndSingUpRepo = singInAndSingUpRepo;
         this.passwordEncoder = passwordEncoder;
         this.customUserService = customUserService;
         this.sellerRepo = sellerRepo;
+        this.customerRepo = customerRepo;
     }
+
     @Override
     public SingInAndSingUp signUp(SignUpRequest signUpRequest) {
         SingInAndSingUp byEmail = singInAndSingUpRepo.findByEmail(signUpRequest.getEmail());
@@ -50,10 +55,13 @@ public class SingInAndSingUpImpl implements SingInAndSingUpService {
             seller.setEmail(singInAndSingUp.getEmail());
             seller.setRegDate(LocalDateTime.now());
             sellerRepo.save(seller);
+        }else if(singInAndSingUp.getRole().compareTo("ROLE_CUSTOMER")==0){
+            Customer customer = new Customer();
+            customer.setId(UUID.randomUUID().toString());
+            customer.setEmail(singInAndSingUp.getEmail());
+            customerRepo.save(customer);
         }
-
         return singInAndSingUpRepo.save(singInAndSingUp);
-
     }
 
     @Override
