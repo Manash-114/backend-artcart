@@ -2,8 +2,11 @@ package com.artcart.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -14,8 +17,9 @@ public class Customer {
     private String email;
     private String phoneNumber;
     private String profileImage;
-    private String city;
-    private String state;
-    private String zipCode;
-    private String street;
+    @OneToMany(mappedBy = "customer")
+    private List<Address> address;
+
+    @OneToMany(mappedBy = "customer")
+    private List<WishList> wishLists;
 }

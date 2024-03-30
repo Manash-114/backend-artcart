@@ -1,5 +1,6 @@
 package com.artcart.services;
 
+import com.artcart.model.Customer;
 import com.artcart.response.CategoryDto;
 
 import java.util.List;
@@ -11,4 +12,5 @@ public interface CategoryService {
 
     List<CategoryDto> getAllCategory();
     CategoryDto getSingleCategory(Integer cId);
+
 }
