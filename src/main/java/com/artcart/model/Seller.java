@@ -32,5 +32,4 @@ public class Seller {
     @JsonBackReference
     @OneToMany(mappedBy = "seller")
     private List<Product> products;
-
 }

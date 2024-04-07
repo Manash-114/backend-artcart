@@ -2,11 +2,11 @@ server:
   port: 7002
 spring:
   datasource:
-    url: jdbc:mysql://monorail.proxy.rlwy.net:26536/railway
-    username: root
-    password: -cG3BAaaC532Eghc4F--D6-hH6H5agCf
+    url: jdbc:mysql://localhost:3306/artcart_db?serverTimeZone=UTC
+    username: artcart
+    password: manash@12345@
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
-
+    show-sql: true

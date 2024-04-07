@@ -30,9 +30,10 @@ public class Product {
     private Category category;
 
     @ManyToOne
-//    @JsonManagedReference
+    @JsonBackReference
     private Seller seller;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "product")
     private List<Review> reviews;
 

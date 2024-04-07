@@ -22,4 +22,7 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer")
     private List<WishList> wishLists;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Order> orders;
 }

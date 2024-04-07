@@ -3,10 +3,14 @@ package com.artcart.controller;
 import com.artcart.config.JwtTokenProvider;
 import com.artcart.exception.CloudinaryImageUploadException;
 import com.artcart.exception.UserNotFound;
+import com.artcart.model.Customer;
 import com.artcart.model.Seller;
 import com.artcart.repository.SellerRepo;
+import com.artcart.request.AccecptOrderReq;
 import com.artcart.response.SellerDto;
+import com.artcart.response.SellerOrderRes;
 import com.artcart.services.CloudinaryImageUpload;
+import com.artcart.services.OrderService;
 import com.artcart.services.SellerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -17,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -31,13 +36,16 @@ public class SellerController {
     private ObjectMapper objectMapper;
     private Logger logger = LoggerFactory.getLogger(SellerController.class);
 
-    public SellerController(SellerService sellerService , JwtTokenProvider jwtTokenProvider,SellerRepo sellerRepo,
-    CloudinaryImageUpload cloudinaryImageUpload,ObjectMapper objectMapper){
-        this.sellerService =sellerService;
+    private OrderService orderService;
+
+    public SellerController(SellerService sellerService, JwtTokenProvider jwtTokenProvider, SellerRepo sellerRepo, CloudinaryImageUpload cloudinaryImageUpload, ObjectMapper objectMapper, OrderService orderService) {
+        this.sellerService = sellerService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.sellerRepo = sellerRepo;
         this.cloudinaryImageUpload = cloudinaryImageUpload;
         this.objectMapper = objectMapper;
+
+        this.orderService = orderService;
     }
 
     @GetMapping
@@ -78,5 +86,31 @@ public class SellerController {
     @GetMapping("/test")
     public String home (){
         return  "home";
+    }
+
+    @GetMapping("/new-order")
+    public ResponseEntity<?> getAllNewOrder(@RequestHeader("Authorization") String token) throws Exception{
+        String email = jwtTokenProvider.getEmailFromToken(token);
+        SellerDto seller = sellerService.getSellerByEmail(email);
+        List<SellerOrderRes> allOrderOfSeller = orderService.getAllNewOrderOfSeller(seller.getId());
+        return new ResponseEntity<>(allOrderOfSeller, HttpStatus.OK);
+
+    }
+    @GetMapping("/all-order")
+    public ResponseEntity<?> getAllOrder(@RequestHeader("Authorization") String token) throws Exception{
+        String email = jwtTokenProvider.getEmailFromToken(token);
+        SellerDto seller = sellerService.getSellerByEmail(email);
+        List<SellerOrderRes> allOrderOfSeller = orderService.getAllOrderOfSeller(seller.getId());
+        return new ResponseEntity<>(allOrderOfSeller, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/accept-order")
+    public ResponseEntity<?> acceptOrder(@RequestHeader("Authorization") String token, @RequestBody AccecptOrderReq accecptOrderReq) throws Exception{
+        String email = jwtTokenProvider.getEmailFromToken(token);
+        SellerDto seller = sellerService.getSellerByEmail(email);
+        sellerService.acceptOrder(accecptOrderReq);
+        return new ResponseEntity<>("done", HttpStatus.OK);
+
     }
 }
