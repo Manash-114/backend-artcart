@@ -13,6 +13,7 @@ import com.artcart.services.CloudinaryImageUpload;
 import com.artcart.services.OrderService;
 import com.artcart.services.SellerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -49,6 +50,7 @@ public class SellerController {
     }
 
     @GetMapping
+    @Operation(summary = "to get seller details by providing jwt token ")
     public ResponseEntity<SellerDto> getSellerHandler(@RequestHeader("Authorization") String jwtToken) throws Exception{
         String emailFromToken = jwtTokenProvider.getEmailFromToken(jwtToken);
         SellerDto sellerByEmail = sellerService.getSellerByEmail(emailFromToken);
@@ -56,6 +58,7 @@ public class SellerController {
     }
 
     @PostMapping("/save")
+    @Operation(summary = "to save his profile ")
     public ResponseEntity<SellerDto> createHandler(@RequestParam("aadhaarImage")MultipartFile aadhaarImage,
                                                    @RequestParam("profileImage") MultipartFile profileImage,
                                                    @RequestParam("data") String data,
@@ -83,12 +86,9 @@ public class SellerController {
         }
     }
 
-    @GetMapping("/test")
-    public String home (){
-        return  "home";
-    }
 
     @GetMapping("/new-order")
+    @Operation(summary = "to get all get order details")
     public ResponseEntity<?> getAllNewOrder(@RequestHeader("Authorization") String token) throws Exception{
         String email = jwtTokenProvider.getEmailFromToken(token);
         SellerDto seller = sellerService.getSellerByEmail(email);
@@ -97,6 +97,7 @@ public class SellerController {
 
     }
     @GetMapping("/all-order")
+    @Operation(summary = "to get all order details")
     public ResponseEntity<?> getAllOrder(@RequestHeader("Authorization") String token) throws Exception{
         String email = jwtTokenProvider.getEmailFromToken(token);
         SellerDto seller = sellerService.getSellerByEmail(email);
@@ -106,6 +107,7 @@ public class SellerController {
     }
 
     @PostMapping("/accept-order")
+    @Operation(summary = "to accept a order ")
     public ResponseEntity<?> acceptOrder(@RequestHeader("Authorization") String token, @RequestBody AccecptOrderReq accecptOrderReq) throws Exception{
         String email = jwtTokenProvider.getEmailFromToken(token);
         SellerDto seller = sellerService.getSellerByEmail(email);

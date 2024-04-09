@@ -38,6 +38,7 @@ public class JwtTokenProvider {
         jwtToken = jwtToken.substring(7);
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwtToken).getBody();
         String roles = String.valueOf(claims.get("role"));
+        System.out.println(roles);
         return roles;
     }
 }

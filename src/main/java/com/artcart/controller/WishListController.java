@@ -84,8 +84,7 @@ public class WishListController {
     @GetMapping("/wishlist/{wishListId}")
     public ResponseEntity<?> getAllProductOfWishList(@PathVariable String wishListId) throws Exception {
         List<ProductResDto> allProductOfWishList = wishListService.getAllProductOfWishList(wishListId);
-
-        Map<String,Object> res = new HashMap<>();
+    Map<String,Object> res = new HashMap<>();
         res.put("data",allProductOfWishList);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }

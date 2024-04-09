@@ -6,6 +6,7 @@ import com.artcart.request.ProductAddToCartReq;
 import com.artcart.response.CartResDto;
 import com.artcart.services.CartService;
 import com.artcart.services.CustomerService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,6 +43,7 @@ public class CartController {
 //    }
 
     @PostMapping("/add-product")
+    @Operation(summary = "to add product into cart use this ")
     public ResponseEntity<?> addProductToCartHandler(@RequestHeader("Authorization") String token,@RequestBody List<ProductAddToCartReq> productAddToCartReq) throws Exception {
         String customerEmail = jwtTokenProvider.getEmailFromToken(token);
         Customer customer = customerService.getCustomerByEmail(customerEmail);

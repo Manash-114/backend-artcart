@@ -9,6 +9,7 @@ import com.artcart.response.AuthResponse;
 import com.artcart.response.SignUpResponse;
 import com.artcart.services.CustomUserService;
 import com.artcart.services.SingInAndSingUpService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -34,6 +35,7 @@ public class AuthController {
         this.tokenProvider = tokenProvider;
     }
     @PostMapping("/signup")
+    @Operation(summary = "for signup",description = "for seller role= SELLER ,  for customer role = CUSTOMER , for admin role= ADMIN")
     public ResponseEntity<SignUpResponse> signUphandler(@RequestBody SignUpRequest signUpRequest){
 
         SingInAndSingUp singInAndSingUp = singInAndSingUpService.signUp(signUpRequest);
@@ -45,13 +47,16 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
+    @Operation(summary = "for signin ",description = "return a jwt token")
     public ResponseEntity<AuthResponse> singInhanlder(@RequestBody SignInRequest signInRequest){
         String email = signInRequest.getEmail();
         String password = signInRequest.getPassword();
         Authentication authentication = authenticate(email,password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.generateToken(authentication);
-        return new ResponseEntity<>(new AuthResponse(token,true), HttpStatus.ACCEPTED);
+        String roleFromToken = tokenProvider.getRoleFromToken("Bearer "+token);
+
+        return new ResponseEntity<>(new AuthResponse(token,true,roleFromToken), HttpStatus.ACCEPTED);
     }
 
     public Authentication authenticate(String username,String password){

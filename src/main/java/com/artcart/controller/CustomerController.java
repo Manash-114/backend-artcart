@@ -7,6 +7,7 @@ import com.artcart.response.AddressRes;
 import com.artcart.response.CustomerOrderRes;
 import com.artcart.services.CustomerService;
 import com.artcart.services.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ public class CustomerController {
     }
 
     @PostMapping("/new-address")
+    @Operation(summary = "to add new address")
     public ResponseEntity<AddressRes> addNewAddressHandler(@RequestHeader("Authorization") String token, @RequestBody AddressReq addressReq) throws Exception {
         String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
         Customer customer = customerService.getCustomerByEmail(emailFromToken);
@@ -39,6 +41,7 @@ public class CustomerController {
     }
 
     @GetMapping("/address")
+    @Operation(summary = "to get all addresses")
     public ResponseEntity<List<AddressRes>> getAllAddress(@RequestHeader("Authorization") String token) throws Exception {
         String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
         Customer customer = customerService.getCustomerByEmail(emailFromToken);
@@ -47,6 +50,7 @@ public class CustomerController {
     }
 
     @GetMapping("/orders")
+    @Operation(summary = "to get all orders details")
     public ResponseEntity<?> getAllOrders(@RequestHeader("Authorization") String token) throws Exception {
         String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
         Customer customer = customerService.getCustomerByEmail(emailFromToken);
