@@ -28,6 +28,7 @@ public class Seller {
     private String phoneNumber;
     private LocalDateTime regDate;
     private boolean approved;
+    private boolean isProfileCompleted;
 
     @JsonBackReference
     @OneToMany(mappedBy = "seller")

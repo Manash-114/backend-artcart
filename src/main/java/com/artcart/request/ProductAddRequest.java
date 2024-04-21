@@ -1,22 +1,22 @@
-package com.artcart.response;
+package com.artcart.request;
 
 import com.artcart.model.Seller;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@Builder
-public class ProductReqDto {
+public class ProductAddRequest {
     private String name;
     private Integer price;
     private String description;
     private boolean stock;
     private List<String> productImages;
     private Integer category;
-    private Seller seller;
 }

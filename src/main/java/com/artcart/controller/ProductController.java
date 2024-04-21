@@ -2,17 +2,13 @@ package com.artcart.controller;
 
 import com.artcart.config.JwtTokenProvider;
 import com.artcart.model.Customer;
-import com.artcart.model.Seller;
 import com.artcart.repository.CustomerRepo;
 import com.artcart.request.ReviewReq;
 import com.artcart.request.UpdateProduct;
-import com.artcart.response.ProductReqDto;
 import com.artcart.response.ProductResDto;
-import com.artcart.response.SellerDto;
 import com.artcart.services.ProductService;
 import com.artcart.services.ReviewService;
 import com.artcart.services.SellerService;
-import com.cloudinary.http44.api.Response;
 import io.swagger.v3.oas.annotations.Operation;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -46,19 +42,7 @@ public class ProductController {
         this.customerRepo = customerRepo;
     }
 
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
-    @PostMapping()
-    @Operation(summary = "to add a new product")
-    public ResponseEntity<?> addProductHandler(@RequestHeader("Authorization") String token , @RequestBody ProductReqDto productReqDto) throws Exception{
-        String sellerEmail = jwtTokenProvider.getEmailFromToken(token);
-        System.out.println(productReqDto);
-        SellerDto sellerByEmail = sellerService.getSellerByEmail(sellerEmail);
-        productReqDto.setSeller(modelMapper.map(sellerByEmail, Seller.class));
-        productService.addProduct(productReqDto);
-        Map<String,String> map = new HashMap<>();
-        map.put("message","Product add successfully");
-        return new ResponseEntity<>(map, HttpStatus.CREATED);
-    }
+
 
     @GetMapping
     @Operation(summary = "to get all product")

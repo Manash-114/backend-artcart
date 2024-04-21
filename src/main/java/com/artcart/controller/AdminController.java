@@ -1,9 +1,11 @@
 package com.artcart.controller;
 
 
+import com.artcart.config.JwtTokenProvider;
 import com.artcart.exception.UserNotFound;
 import com.artcart.model.Seller;
 import com.artcart.repository.SellerRepo;
+import com.artcart.response.AdminDetailsResDto;
 import com.artcart.response.CategoryDto;
 import com.artcart.response.SellerDto;
 import com.artcart.services.AdminServices;
@@ -39,15 +41,24 @@ public class AdminController {
     private SellerRepo sellerRepo;
     private SellerService sellerService;
     private ModelMapper modelMapper;
-
+    private JwtTokenProvider jwtTokenProvider;
     private CategoryService categoryService;
-    public AdminController(AdminServices adminServices , SellerRepo sellerRepo , SellerService sellerService,ModelMapper modelMapper,
-                           CategoryService categoryService){
+
+    public AdminController(AdminServices adminServices, SellerRepo sellerRepo, SellerService sellerService, ModelMapper modelMapper, JwtTokenProvider jwtTokenProvider, CategoryService categoryService) {
         this.adminServices = adminServices;
         this.sellerRepo = sellerRepo;
         this.sellerService = sellerService;
         this.modelMapper = modelMapper;
+        this.jwtTokenProvider = jwtTokenProvider;
         this.categoryService = categoryService;
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<AdminDetailsResDto> getAdminDetails(@RequestHeader("Authorization") String token) throws Exception {
+        String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
+        AdminDetailsResDto adminDetais = adminServices.getAdminDetais(emailFromToken);
+        return new ResponseEntity<>(adminDetais,HttpStatus.OK);
+
     }
 
     @GetMapping("/all-unapproved-seller")
@@ -67,11 +78,14 @@ public class AdminController {
         return new ResponseEntity<>(allUnApprovedSeller, HttpStatus.OK);
     }
 
-    @PutMapping("/approve-seller/{sellerId}")
+    @PutMapping("/approve-seller/{sellerId}/{approvedStatus}")
     @Operation(summary = "To approve seller")
-    public ResponseEntity<Map<String, String>> handlerForApprovedSingleSeller(@PathVariable Integer sellerId){
+    public ResponseEntity<Map<String, String>> handlerForApprovedSingleSeller(@PathVariable Integer sellerId,@PathVariable Integer approvedStatus){
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new UserNotFound("seller not found with id " + sellerId));
-        seller.setApproved(true);
+        if(approvedStatus==1)
+            seller.setApproved(true);
+        else
+            seller.setApproved(false);
         sellerRepo.save(seller);
         Map<String,String> res = new HashMap<>();
         res.put("message","successfully approved");

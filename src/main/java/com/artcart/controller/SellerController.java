@@ -3,25 +3,31 @@ package com.artcart.controller;
 import com.artcart.config.JwtTokenProvider;
 import com.artcart.exception.CloudinaryImageUploadException;
 import com.artcart.exception.UserNotFound;
-import com.artcart.model.Customer;
 import com.artcart.model.Seller;
 import com.artcart.repository.SellerRepo;
 import com.artcart.request.AccecptOrderReq;
+import com.artcart.request.ProductAddRequest;
+import com.artcart.request.ProductReqDto;
+import com.artcart.response.ProductResDto;
 import com.artcart.response.SellerDto;
 import com.artcart.response.SellerOrderRes;
 import com.artcart.services.CloudinaryImageUpload;
 import com.artcart.services.OrderService;
+import com.artcart.services.ProductService;
 import com.artcart.services.SellerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,15 +45,21 @@ public class SellerController {
 
     private OrderService orderService;
 
-    public SellerController(SellerService sellerService, JwtTokenProvider jwtTokenProvider, SellerRepo sellerRepo, CloudinaryImageUpload cloudinaryImageUpload, ObjectMapper objectMapper, OrderService orderService) {
+    private ProductService productService;
+    private ModelMapper modelMapper;
+    public SellerController(SellerService sellerService, JwtTokenProvider jwtTokenProvider,
+                            SellerRepo sellerRepo, CloudinaryImageUpload cloudinaryImageUpload,
+                            ObjectMapper objectMapper, OrderService orderService, ProductService productService,ModelMapper modelMapper) {
         this.sellerService = sellerService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.sellerRepo = sellerRepo;
         this.cloudinaryImageUpload = cloudinaryImageUpload;
         this.objectMapper = objectMapper;
-
         this.orderService = orderService;
+        this.productService = productService;
+        this.modelMapper = modelMapper;
     }
+
 
     @GetMapping
     @Operation(summary = "to get seller details by providing jwt token ")
@@ -86,6 +98,17 @@ public class SellerController {
         }
     }
 
+//    @PostMapping(value = "/add-product", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/add-product")
+    @Operation(summary = "to add a new product")
+    public ResponseEntity<?> addProductHandler(@RequestHeader("Authorization") String token ,  @RequestBody ProductAddRequest productAddRequest) throws Exception{
+        String sellerEmail = jwtTokenProvider.getEmailFromToken(token);
+        SellerDto sellerByEmail = sellerService.getSellerByEmail(sellerEmail);
+        productService.addProduct(productAddRequest,sellerByEmail.getId());
+        Map<String,String> map = new HashMap<>();
+        map.put("message","Product add successfully");
+        return new ResponseEntity<>(map, HttpStatus.CREATED);
+    }
 
     @GetMapping("/new-order")
     @Operation(summary = "to get all get order details")
@@ -114,5 +137,13 @@ public class SellerController {
         sellerService.acceptOrder(accecptOrderReq);
         return new ResponseEntity<>("done", HttpStatus.OK);
 
+    }
+
+    @GetMapping("/all-products")
+    public ResponseEntity<List<ProductResDto>> getAllProductOfSeller(@RequestHeader("Authorization") String token) throws Exception {
+        String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
+        SellerDto sellerByEmail = sellerService.getSellerByEmail(emailFromToken);
+        List<ProductResDto> allProductOfSeller = productService.getAllProductOfSeller(sellerByEmail.getId());
+        return new ResponseEntity<>(allProductOfSeller,HttpStatus.OK);
     }
 }

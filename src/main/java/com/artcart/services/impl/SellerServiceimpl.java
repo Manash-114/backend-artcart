@@ -45,6 +45,7 @@ public class SellerServiceimpl implements SellerService {
         byEmail.setProfileImage(seller.getProfileImage());
         byEmail.setPhoneNumber(seller.getPhoneNumber());
         byEmail.setAadhaarNo(seller.getAadhaarNo());
+        byEmail.setProfileCompleted(true);
         Seller save = sellerRepo.save(byEmail);
         return modelMapper.map(save,SellerDto.class);
     }

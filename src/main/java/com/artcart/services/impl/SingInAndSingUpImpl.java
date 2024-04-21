@@ -1,9 +1,11 @@
 package com.artcart.services.impl;
 
 
+import com.artcart.model.Admin;
 import com.artcart.model.Customer;
 import com.artcart.model.Seller;
 import com.artcart.model.SingInAndSingUp;
+import com.artcart.repository.AdminRepo;
 import com.artcart.repository.CustomerRepo;
 import com.artcart.repository.SellerRepo;
 import com.artcart.repository.SingInAndSingUpRepo;
@@ -30,13 +32,15 @@ public class SingInAndSingUpImpl implements SingInAndSingUpService {
 
     private SellerRepo sellerRepo;
     private CustomerRepo customerRepo;
+    private AdminRepo adminRepo;
 
-    public SingInAndSingUpImpl(SingInAndSingUpRepo singInAndSingUpRepo, PasswordEncoder passwordEncoder, CustomUserService customUserService, SellerRepo sellerRepo, CustomerRepo customerRepo) {
+    public SingInAndSingUpImpl(SingInAndSingUpRepo singInAndSingUpRepo, PasswordEncoder passwordEncoder, CustomUserService customUserService, SellerRepo sellerRepo, CustomerRepo customerRepo, AdminRepo adminRepo) {
         this.singInAndSingUpRepo = singInAndSingUpRepo;
         this.passwordEncoder = passwordEncoder;
         this.customUserService = customUserService;
         this.sellerRepo = sellerRepo;
         this.customerRepo = customerRepo;
+        this.adminRepo = adminRepo;
     }
 
     @Override
@@ -60,6 +64,12 @@ public class SingInAndSingUpImpl implements SingInAndSingUpService {
             customer.setId(UUID.randomUUID().toString());
             customer.setEmail(singInAndSingUp.getEmail());
             customerRepo.save(customer);
+        }
+        else if(singInAndSingUp.getRole().compareTo("ROLE_ADMIN")==0){
+            Admin admin = new Admin();
+            admin.setId(UUID.randomUUID().toString());
+            admin.setEmail(singInAndSingUp.getEmail());
+            adminRepo.save(admin);
         }
         return singInAndSingUpRepo.save(singInAndSingUp);
     }

@@ -9,7 +9,7 @@ import java.util.List;
 public interface SellerRepo extends JpaRepository<Seller,Integer> {
 
     Seller findByEmail(String email);
-    List<Seller> findByApproved(boolean type);
+    List<Seller> findByApprovedAndIsProfileCompleted(boolean type,boolean profile);
 
     Seller findByProducts(Product product);
 }

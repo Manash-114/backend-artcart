@@ -28,7 +28,6 @@ public class Product {
     @ManyToOne
 //    @JsonManagedReference
     private Category category;
-
     @ManyToOne
     @JsonBackReference
     private Seller seller;

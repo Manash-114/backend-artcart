@@ -1,7 +1,10 @@
 package com.artcart.services.impl;
 
+import com.artcart.model.Admin;
 import com.artcart.model.Seller;
+import com.artcart.repository.AdminRepo;
 import com.artcart.repository.SellerRepo;
+import com.artcart.response.AdminDetailsResDto;
 import com.artcart.response.SellerDto;
 import com.artcart.services.AdminServices;
 import org.modelmapper.ModelMapper;
@@ -17,10 +20,14 @@ public class AdminServiceImpl implements AdminServices {
 
     private ModelMapper modelMapper;
     private SellerRepo sellerRepo;
-    public AdminServiceImpl(ModelMapper modelMapper, SellerRepo sellerRepo){
+    private AdminRepo adminRepo;
+
+    public AdminServiceImpl(ModelMapper modelMapper, SellerRepo sellerRepo, AdminRepo adminRepo) {
         this.modelMapper = modelMapper;
         this.sellerRepo = sellerRepo;
+        this.adminRepo = adminRepo;
     }
+
     @Override
     public void approveSeller(SellerDto sellerDto) {
         Seller seller = modelMapper.map(sellerDto, Seller.class);
@@ -34,13 +41,16 @@ public class AdminServiceImpl implements AdminServices {
     }
 
     @Override
-    public List<SellerDto> getAllUnApprovedSeller() {
-        List<Seller> byApproved = sellerRepo.findByApproved(false);
-        List<SellerDto> sellerDtos = new ArrayList<>();
-        byApproved.stream().map((item)->{
-           return  sellerDtos.add(modelMapper.map(item, SellerDto.class));
-        }).collect(Collectors.toList());
+    public AdminDetailsResDto getAdminDetais(String email) {
+        Admin byEmail = adminRepo.findByEmail(email);
+        AdminDetailsResDto map = modelMapper.map(byEmail, AdminDetailsResDto.class);
+        return map;
+    }
 
-        return  sellerDtos;
+    @Override
+    public List<SellerDto> getAllUnApprovedSeller() {
+        List<Seller> byApproved = sellerRepo.findByApprovedAndIsProfileCompleted(false,true);
+        List<SellerDto> collect = byApproved.stream().map((item) -> modelMapper.map(item, SellerDto.class)).collect(Collectors.toList());
+        return  collect;
     }
 }
