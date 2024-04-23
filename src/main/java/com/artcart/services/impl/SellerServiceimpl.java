@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -62,18 +63,21 @@ public class SellerServiceimpl implements SellerService {
     }
 
     @Override
-    public void acceptOrder(AccecptOrderReq accecptOrderReq) {
+    public void acceptOrder(AccecptOrderReq accecptOrderReq,Integer sellerId) {
+
+        Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("seller not found with id +" + sellerId));
 
         Order order = orderRepo.findById(accecptOrderReq.getOrderId()).orElseThrow(()-> new ResourceNotFoundException("order not found with id"+accecptOrderReq.getOrderId()));
-        List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrders(order);
 
-        byOrders.forEach((p)->{
-            if(p.getId().compareTo(accecptOrderReq.getProductId())==0){
-                p.setCourierName(accecptOrderReq.getCourierName());
-                p.setDeliveryStatus(accecptOrderReq.getDeliveryStatus());
-            }
+        List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrders(order);
+        List<ProductBelongsToOrder> collect = byOrders.stream().filter((b) -> b.getProducts().getSeller() == seller).collect(Collectors.toList());
+
+        collect.forEach((i)->{
+//            System.out.println(i.g());
+            i.setCourierName(accecptOrderReq.getCourierName());
+            i.setDeliveryStatus("SHIPPED");
         });
-        order.setProducts(byOrders);
+        order.setProducts(collect);
         orderRepo.save(order);
     }
 }

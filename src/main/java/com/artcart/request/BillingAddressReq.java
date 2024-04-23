@@ -1,19 +1,19 @@
 package com.artcart.request;
 
 import com.artcart.model.Address;
-import com.artcart.model.ProductBelongsToOrder;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccecptOrderReq {
-    private String orderId;
-    private String courierName;
+public class BillingAddressReq {
+    private String customerName;
+    private String phoneNumber;
+    private String alternatePhoneNumber;
+    private String addressId;
 }

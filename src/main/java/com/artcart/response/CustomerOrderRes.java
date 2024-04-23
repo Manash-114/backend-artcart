@@ -18,7 +18,6 @@ public class CustomerOrderRes {
     private String orderId;
     private Integer orderAmount;
     private LocalDateTime orderDate;
-
     private Address address;
     private List<ProductBelongsToOrder> productsBelongsToOrder;
 }

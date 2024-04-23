@@ -43,14 +43,16 @@ public class ProductServiceImpl implements ProductService {
     public void addProduct(ProductAddRequest productReqDto , Integer sellerId) {
         //find category
         CategoryDto singleCategory = categoryService.getSingleCategory(productReqDto.getCategory());
-        String pId = UUID.randomUUID().toString();
+
        //find Seller
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("seller not found with id " + sellerId));
 
+
         Product product = new Product();
+        String pId = UUID.randomUUID().toString();
         product.setId(pId);
         product.setCategory(modelMapper.map(singleCategory, Category.class));
-        List<ProductImage> collect = productReqDto.getProductImages().stream().map((item -> new ProductImage(UUID.randomUUID().toString(), item, List.of(product)))).collect(Collectors.toList());
+        List<ProductImage> collect = productReqDto.getProductImages().stream().map((item -> new ProductImage(UUID.randomUUID().toString(), item , product ))).collect(Collectors.toList());
         product.setProductImages(collect);
         product.setName(productReqDto.getName());
         product.setPrice(productReqDto.getPrice());

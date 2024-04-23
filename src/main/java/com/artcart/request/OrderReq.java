@@ -15,9 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderReq {
-    private String orderId;
-    private String addressId;
+    private BillingAddressReq billingAddress;
     private List<ProductAddToCartReq> products;
     private PaymentReq paymentReq;
-    private String status;
 }

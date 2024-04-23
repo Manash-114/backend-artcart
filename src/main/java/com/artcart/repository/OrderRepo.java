@@ -13,7 +13,7 @@ import java.util.List;
 public interface OrderRepo extends JpaRepository<Order,String> {
     List<Order> findByStatus(String status);
 
-    @Query("select o from Order o join o.sellers s where s.id=:sellerId AND o.status='CREATED'")
+    @Query("select o from Order o join o.sellers s where s.id=:sellerId")
     List<Order> findNewOrderBySellerId(@Param("sellerId") Integer sellerId);
     @Query("select o from Order o join o.sellers s where s.id=:sellerId")
     List<Order> findAllOrderBySellerId(@Param("sellerId") Integer sellerId);

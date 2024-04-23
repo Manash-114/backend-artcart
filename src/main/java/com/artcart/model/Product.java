@@ -19,11 +19,11 @@ public class Product {
     private String id;
     private String name;
     private Integer price;
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
     private boolean stock;
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "product_with_images")
-//    @JsonManagedReference
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "product")
+    @JsonManagedReference
     private List<ProductImage> productImages;
     @ManyToOne
 //    @JsonManagedReference
@@ -31,7 +31,6 @@ public class Product {
     @ManyToOne
     @JsonBackReference
     private Seller seller;
-
     @JsonBackReference
     @OneToMany(mappedBy = "product")
     private List<Review> reviews;

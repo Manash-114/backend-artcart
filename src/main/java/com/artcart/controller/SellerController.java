@@ -134,8 +134,11 @@ public class SellerController {
     public ResponseEntity<?> acceptOrder(@RequestHeader("Authorization") String token, @RequestBody AccecptOrderReq accecptOrderReq) throws Exception{
         String email = jwtTokenProvider.getEmailFromToken(token);
         SellerDto seller = sellerService.getSellerByEmail(email);
-        sellerService.acceptOrder(accecptOrderReq);
-        return new ResponseEntity<>("done", HttpStatus.OK);
+        sellerService.acceptOrder(accecptOrderReq,seller.getId());
+        Map<String,Object>  res = new HashMap<>();
+        res.put("message","Order Accepted Successfully");
+        res.put("status",HttpStatus.OK);
+        return new ResponseEntity<>(res, HttpStatus.OK);
 
     }
 

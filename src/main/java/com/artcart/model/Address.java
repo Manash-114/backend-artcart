@@ -19,12 +19,19 @@ public class Address {
     private String id;
     private String city;
     private String state;
-    private String zipCode;
-    private String street;
+    private String pincode;
+    private String address;
+    private String locality;
+    private String landmark;
     @ManyToOne
     @JsonBackReference
     private Customer customer;
-    @JsonBackReference
+
     @OneToMany(mappedBy = "address")
-    private List<Order> orders;
+    @JsonBackReference
+    private List<BillingAddress> billingAddress;
+
+//    @JsonBackReference
+//    @OneToMany(mappedBy = "address")
+//    private List<Order> orders;
 }

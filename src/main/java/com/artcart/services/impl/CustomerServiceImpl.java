@@ -38,16 +38,20 @@ public class CustomerServiceImpl implements CustomerService {
         address.setCustomer(customer);
         address.setCity(addressReq.getCity());
         address.setState(addressReq.getState());
-        address.setZipCode(addressReq.getZipCode());
-        address.setStreet(addressReq.getStreet());
+        address.setPincode(addressReq.getPincode());
+        address.setAddress(addressReq.getAddress());
+        address.setLandmark(addressReq.getLandmark());
+        address.setLocality(addressReq.getLocality());
         Address save = addressRepo.save(address);
 
         AddressRes addressRes = new AddressRes();
         addressRes.setId(save.getId());
         addressRes.setCity(save.getCity());
-        addressRes.setStreet(save.getStreet());
+        addressRes.setAddress(save.getAddress());
         addressRes.setState(save.getState());
-        addressRes.setZipCode(save.getZipCode());
+        addressRes.setLocality(save.getLocality());
+        addressRes.setLandmark(save.getLandmark());
+        addressRes.setPincode(save.getPincode());
         return  addressRes;
     }
 
@@ -66,9 +70,11 @@ public class CustomerServiceImpl implements CustomerService {
             AddressRes addressRes = new AddressRes();
             addressRes.setId(item.getId());
             addressRes.setCity(item.getCity());
-            addressRes.setStreet(item.getStreet());
+            addressRes.setAddress(item.getAddress());
             addressRes.setState(item.getState());
-            addressRes.setZipCode(item.getZipCode());
+            addressRes.setPincode(item.getPincode());
+            addressRes.setLandmark(item.getLandmark());
+            addressRes.setLocality(item.getLocality());
             addressResList.add(addressRes);
         });
 

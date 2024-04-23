@@ -17,28 +17,32 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "order_table")
+
+
 public class Order {
     @Id
     private String orderId;
-    private Integer orderAmount;
     private LocalDateTime orderDate;
-    @ManyToOne
+    @OneToOne(cascade = CascadeType.ALL)
+
+
     @JsonManagedReference
-    private Address address;
+    private BillingAddress billingAddress;
+
 
     @JsonManagedReference
     @OneToMany(mappedBy = "orders",cascade = CascadeType.ALL)
     private List<ProductBelongsToOrder> products;
+
 
     @JsonManagedReference
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "order_manage_by_seller")
     private List<Seller> sellers;
 
-    @JsonManagedReference
+
     @OneToOne(cascade = CascadeType.ALL)
     private Payment payment;
-    
     @ManyToOne
     @JsonManagedReference
     private Customer customer;

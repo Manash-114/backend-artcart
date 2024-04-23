@@ -31,6 +31,14 @@ public class CustomerController {
         this.orderService = orderService;
     }
 
+    @GetMapping()
+    @Operation(summary = "get customer details")
+    public ResponseEntity<?> getCustomerDetails(@RequestHeader("Authorization") String token) throws Exception {
+        String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
+        Customer customer = customerService.getCustomerByEmail(emailFromToken);
+        return new ResponseEntity<>(customer, HttpStatus.OK);
+    }
+
     @PostMapping("/new-address")
     @Operation(summary = "to add new address")
     public ResponseEntity<AddressRes> addNewAddressHandler(@RequestHeader("Authorization") String token, @RequestBody AddressReq addressReq) throws Exception {
@@ -57,6 +65,4 @@ public class CustomerController {
         List<CustomerOrderRes> allOrdersOfCustomer = orderService.getAllOrdersOfCustomer(customer.getId());
         return new ResponseEntity<>(allOrdersOfCustomer, HttpStatus.OK);
     }
-
-
 }
