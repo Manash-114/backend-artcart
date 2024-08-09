@@ -9,4 +9,7 @@ import java.util.List;
 public interface ProductBelongsToOrderRepo extends JpaRepository<ProductBelongsToOrder,String> {
 
     List<ProductBelongsToOrder> findByOrders(Order order);
+    List<ProductBelongsToOrder> findByOrdersAndDeliveryStatus(Order order,String delivery);
+
 }
+

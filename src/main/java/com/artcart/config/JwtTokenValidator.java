@@ -23,6 +23,7 @@ import java.util.List;
 
 public class JwtTokenValidator extends OncePerRequestFilter {
 
+    //this is very important
     private HandlerExceptionResolver handlerExceptionResolver;
 
     public JwtTokenValidator(HandlerExceptionResolver handlerExceptionResolver) {

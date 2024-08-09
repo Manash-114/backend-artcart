@@ -8,6 +8,7 @@ import com.artcart.repository.SellerRepo;
 import com.artcart.request.AccecptOrderReq;
 import com.artcart.request.ProductAddRequest;
 import com.artcart.request.ProductReqDto;
+import com.artcart.request.UpdateProductReq;
 import com.artcart.response.ProductResDto;
 import com.artcart.response.SellerDto;
 import com.artcart.response.SellerOrderRes;
@@ -108,6 +109,16 @@ public class SellerController {
         Map<String,String> map = new HashMap<>();
         map.put("message","Product add successfully");
         return new ResponseEntity<>(map, HttpStatus.CREATED);
+    }
+    @PostMapping("/update-product/{productId}")
+    @Operation(summary = "to update  a  product")
+    public ResponseEntity<?> updateProduct(@RequestHeader("Authorization") String token ,  @RequestBody UpdateProductReq productUpdateRequest,@PathVariable String productId) throws Exception{
+        String sellerEmail = jwtTokenProvider.getEmailFromToken(token);
+        ProductResDto productResDto = productService.updateProduct(productId, productUpdateRequest);
+        Map<String,Object> map = new HashMap<>();
+        map.put("message","Product update successfully");
+        map.put("data",productResDto);
+        return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
     @GetMapping("/new-order")

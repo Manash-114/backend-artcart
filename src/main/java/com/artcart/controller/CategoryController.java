@@ -13,16 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/category")
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+@RequestMapping("/public/category")
 public class CategoryController {
-
     private CategoryService categoryService;
-
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
-
     @GetMapping()
     @Operation(summary = "to get all categories")
     public ResponseEntity<List<CategoryDto>> getAllCategory(){

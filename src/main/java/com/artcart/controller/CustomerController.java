@@ -5,6 +5,7 @@ import com.artcart.model.Customer;
 import com.artcart.request.AddressReq;
 import com.artcart.response.AddressRes;
 import com.artcart.response.CustomerOrderRes;
+import com.artcart.response.CustomerUnDeliveredOrderRes;
 import com.artcart.services.CustomerService;
 import com.artcart.services.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,12 +58,22 @@ public class CustomerController {
         return new ResponseEntity<>(allAddress, HttpStatus.OK);
     }
 
+    @GetMapping("/un-delivered-orders")
+    @Operation(summary = "to get all unDelivered orders details")
+    public ResponseEntity<?> getAllUnDeliveredOrders(@RequestHeader("Authorization") String token) throws Exception {
+        String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
+        Customer customer = customerService.getCustomerByEmail(emailFromToken);
+        List<CustomerUnDeliveredOrderRes> allOrdersOfCustomer = orderService.getAllUnDeliveredOrderOfCustomer(customer.getId());
+        return new ResponseEntity<>(allOrdersOfCustomer, HttpStatus.OK);
+    }
+
     @GetMapping("/orders")
     @Operation(summary = "to get all orders details")
     public ResponseEntity<?> getAllOrders(@RequestHeader("Authorization") String token) throws Exception {
         String emailFromToken = jwtTokenProvider.getEmailFromToken(token);
         Customer customer = customerService.getCustomerByEmail(emailFromToken);
-        List<CustomerOrderRes> allOrdersOfCustomer = orderService.getAllOrdersOfCustomer(customer.getId());
+        List<CustomerUnDeliveredOrderRes> allOrdersOfCustomer = orderService.getAllOrdersOfCustomer(customer.getId());
         return new ResponseEntity<>(allOrdersOfCustomer, HttpStatus.OK);
+
     }
 }

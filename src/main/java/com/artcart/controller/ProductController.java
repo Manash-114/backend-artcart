@@ -4,7 +4,7 @@ import com.artcart.config.JwtTokenProvider;
 import com.artcart.model.Customer;
 import com.artcart.repository.CustomerRepo;
 import com.artcart.request.ReviewReq;
-import com.artcart.request.UpdateProduct;
+import com.artcart.request.UpdateProductReq;
 import com.artcart.response.ProductResDto;
 import com.artcart.services.ProductService;
 import com.artcart.services.ReviewService;
@@ -55,7 +55,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     @Operation(summary = "to update the product details")
-    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody UpdateProduct updateProduct){
+    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody UpdateProductReq updateProduct){
 
         ProductResDto productResDto = productService.updateProduct(id, updateProduct);
 

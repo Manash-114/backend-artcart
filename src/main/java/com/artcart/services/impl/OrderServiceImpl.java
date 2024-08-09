@@ -6,6 +6,7 @@ import com.artcart.repository.*;
 import com.artcart.request.OrderReq;
 import com.artcart.request.ProductAddToCartReq;
 import com.artcart.response.CustomerOrderRes;
+import com.artcart.response.CustomerUnDeliveredOrderRes;
 import com.artcart.response.SellerOrderRes;
 import com.artcart.services.OrderService;
 import com.artcart.services.SellerService;
@@ -116,20 +117,53 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<CustomerOrderRes> getAllOrdersOfCustomer(String customerId) {
+    public List<CustomerUnDeliveredOrderRes> getAllOrdersOfCustomer(String customerId) {
+
         Customer customer = customerRepo.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("customer not found with id" + customerId));
         List<Order> byCustomer = orderRepo.findByCustomer(customer);
-        List<CustomerOrderRes> customerOrderResList = new ArrayList<>();
+        List<CustomerUnDeliveredOrderRes> customerOrderResList = new ArrayList<>();
 
         byCustomer.forEach((o)->{
-            CustomerOrderRes customerOrderRes = new CustomerOrderRes();
-            customerOrderRes.setOrderId(o.getOrderId());
-            customerOrderRes.setOrderDate(o.getOrderDate());
-//            customerOrderRes.setAddress(o.getAddress());
-            customerOrderRes.setAddress(o.getBillingAddress().getAddress());
-            customerOrderRes.setProductsBelongsToOrder(o.getProducts());
-            customerOrderResList.add(customerOrderRes);
+            List<ProductBelongsToOrder> products = o.getProducts();
+            products.forEach((p)->{
+                if(p.getDeliveryStatus().compareTo("SHIPPED")==0){
+                    CustomerUnDeliveredOrderRes customerOrderRes = new CustomerUnDeliveredOrderRes();
+                    customerOrderRes.setOrderId(o.getOrderId());
+                    customerOrderRes.setOrderDate(o.getOrderDate());
+                    customerOrderRes.setAddress(o.getBillingAddress().getAddress());
+                    customerOrderRes.setProductBelongsToOrder(p);
+                    customerOrderResList.add(customerOrderRes);
+
+                }
+
+            });
         });
+
+
+        return customerOrderResList;
+    }
+
+    @Override
+    public List<CustomerUnDeliveredOrderRes> getAllUnDeliveredOrderOfCustomer(String customerId) {
+        Customer customer = customerRepo.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("customer not found with id" + customerId));
+        List<Order> byCustomer = orderRepo.findByCustomer(customer);
+        List<CustomerUnDeliveredOrderRes> customerOrderResList = new ArrayList<>();
+
+        byCustomer.forEach((o)->{
+            List<ProductBelongsToOrder> products = o.getProducts();
+            products.forEach((p)->{
+                if(p.getDeliveryStatus().compareTo("NOTSHIPPED")==0){
+                    CustomerUnDeliveredOrderRes customerOrderRes = new CustomerUnDeliveredOrderRes();
+                    customerOrderRes.setOrderId(o.getOrderId());
+                    customerOrderRes.setOrderDate(o.getOrderDate());
+                    customerOrderRes.setAddress(o.getBillingAddress().getAddress());
+                    customerOrderRes.setProductBelongsToOrder(p);
+                    customerOrderResList.add(customerOrderRes);
+
+                }
+            });
+        });
+
 
         return customerOrderResList;
     }
@@ -142,27 +176,21 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orderBySellerId = orderRepo.findNewOrderBySellerId(seller.getId());
         List<SellerOrderRes> resData = new ArrayList<>();
         orderBySellerId.forEach((o)->{
-            SellerOrderRes sellerOrderRes = new SellerOrderRes();
-            sellerOrderRes.setOrderId(o.getOrderId());
-            List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrders(o);
+            List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrdersAndDeliveryStatus(o,"NOTSHIPPED");
             List<ProductBelongsToOrder> productAccordingToSeller = new ArrayList<>();
             byOrders.forEach((p)->{
-                if(p.getProducts().getSeller().getId() == sellerId && p.getDeliveryStatus().compareTo("NOTSHIPPED")==0) {
+                SellerOrderRes sellerOrderRes = new SellerOrderRes();
+                if(p.getProducts().getSeller().getId() == sellerId) {
+                    sellerOrderRes.setProductsBelongsToOrder(productAccordingToSeller);
+                    sellerOrderRes.setBillingAddress(o.getBillingAddress());
+                    sellerOrderRes.setAddress(o.getBillingAddress().getAddress());
+                    sellerOrderRes.setOrderId(o.getOrderId());
                     ProductBelongsToOrder map = modelMapper.map(p, ProductBelongsToOrder.class);
-                    System.out.println("hiiiii");
                     productAccordingToSeller.add(map);
+                    resData.add(sellerOrderRes);
                 }
             });
-            sellerOrderRes.setProductsBelongsToOrder(productAccordingToSeller);
-//            sellerOrderRes.setAddress(o.getAddress());
-            sellerOrderRes.setBillingAddress(o.getBillingAddress());
-//            sellerOrderRes.setAddress(o.getBillingAddress().getAddress());
-            sellerOrderRes.setAddress(o.getBillingAddress().getAddress());
-            resData.add(sellerOrderRes);
         });
-
-        System.out.println("size "+resData.size());
-
     return resData;
 
 
@@ -175,14 +203,10 @@ public class OrderServiceImpl implements OrderService {
         List<SellerOrderRes> resData = new ArrayList<>();
 
         orderBySellerId.forEach((o)->{
-
             SellerOrderRes sellerOrderRes = new SellerOrderRes();
             sellerOrderRes.setOrderId(o.getOrderId());
-            System.out.println("status "+o.getStatus());
             List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrders(o);
-
             List<ProductBelongsToOrder> productAccordingToSeller = new ArrayList<>();
-
             byOrders.forEach((p)->{
                 if(p.getProducts().getSeller().getId() == sellerId) {
                     System.out.println("Product name " + p.getProducts().getName());

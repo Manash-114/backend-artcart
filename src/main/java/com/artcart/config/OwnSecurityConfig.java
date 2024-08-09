@@ -50,7 +50,7 @@ public class OwnSecurityConfig {
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 
                         CorsConfiguration corsConfiguration = new CorsConfiguration();
-                        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8000/","http://localhost:5173/","http://10.68.6.18:5173/","http://192.168.137.22:5173/"));
+                        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:8000/","http://localhost:5173/","http://10.68.6.18:5173/","http://192.168.137.22:5173/","http://manash.online/","http://shopartcart.manash.online/","http://192.168.137.82:5173/"));
                         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
                         corsConfiguration.setAllowCredentials(true);
                         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));

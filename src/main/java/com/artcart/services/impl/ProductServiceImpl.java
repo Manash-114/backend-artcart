@@ -9,15 +9,15 @@ import com.artcart.repository.ProductImageRepo;
 import com.artcart.repository.ProductRepo;
 import com.artcart.repository.SellerRepo;
 import com.artcart.request.ProductAddRequest;
-import com.artcart.request.UpdateProduct;
+import com.artcart.request.UpdateProductReq;
 import com.artcart.response.CategoryDto;
-import com.artcart.request.ProductReqDto;
 import com.artcart.response.ProductResDto;
 import com.artcart.services.CategoryService;
 import com.artcart.services.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,7 +43,6 @@ public class ProductServiceImpl implements ProductService {
     public void addProduct(ProductAddRequest productReqDto , Integer sellerId) {
         //find category
         CategoryDto singleCategory = categoryService.getSingleCategory(productReqDto.getCategory());
-
        //find Seller
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("seller not found with id " + sellerId));
 
@@ -69,17 +68,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResDto updateProduct(String productId, UpdateProduct productReqDto) {
+    public ProductResDto updateProduct(String productId, UpdateProductReq productReqDto) {
         Product product = productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("product not found with id " + productId));
-
-        CategoryDto singleCategory = categoryService.getSingleCategory(productReqDto.getCategory());
-        product.setCategory(modelMapper.map(singleCategory, Category.class));
         for(int i = 0 ;i<product.getProductImages().size();i++){
             product.getProductImages().get(i).setName(productReqDto.getProductImages().get(i));
         }
         product.setName(productReqDto.getName());
         product.setPrice(productReqDto.getPrice());
-        product.setStock(true);
+        product.setStock(productReqDto.isStock());
         product.setDescription(productReqDto.getDescription());
         Product save = productRepo.save(product);
         return modelMapper.map(save , ProductResDto.class);
@@ -88,8 +84,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResDto> getAllProduct() {
         List<Product> all = productRepo.findAll();
-        List<ProductResDto> collect = all.stream().map((p) -> modelMapper.map(p, ProductResDto.class)).collect(Collectors.toList());
-        return collect;
+        List<ProductResDto> collect1 = new ArrayList<>();
+
+        all.forEach((p)->{
+            if(p.isStock()){
+                ProductResDto map = modelMapper.map(p, ProductResDto.class);
+                collect1.add(map);
+            }
+        });
+
+//        List<ProductResDto> collect = all.stream().map((p) -> modelMapper.map(p, ProductResDto.class)).collect(Collectors.toList());
+        return collect1;
     }
 
     @Override
@@ -101,7 +106,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResDto> getAllProductOfSeller(Integer sellerId) {
-
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("Seller not found with id " + sellerId));
         List<Product> bySeller = productRepo.findBySeller(seller);
         List<ProductResDto> collect = bySeller.stream().map((product -> modelMapper.map(product, ProductResDto.class))).collect(Collectors.toList());
