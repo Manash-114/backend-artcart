@@ -13,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Table(name = "product_table")
 public class Product {
     @Id
     private String id;

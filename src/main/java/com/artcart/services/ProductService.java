@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface ProductService {
 
-    void addProduct(ProductAddRequest productAddRequest , Integer sellerId);
+    void addProduct(ProductAddRequest productAddRequest , String sellerId);
     void deleteProduct(String productId);
     ProductResDto updateProduct(String productId, UpdateProductReq newProductReqDto);
     List<ProductResDto> getAllProduct();
     ProductResDto getSingleProduct(String productId);
 
-    List<ProductResDto> getAllProductOfSeller(Integer sellerId);
+    List<ProductResDto> getAllProductOfSeller(String sellerId);
 
 
 }

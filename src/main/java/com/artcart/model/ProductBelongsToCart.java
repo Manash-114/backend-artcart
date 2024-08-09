@@ -8,11 +8,9 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "product_belongs_to_cart")
 public class ProductBelongsToCart {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     @ManyToOne
     private Cart cart;
     @ManyToOne

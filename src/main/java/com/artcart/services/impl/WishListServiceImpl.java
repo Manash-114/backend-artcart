@@ -3,6 +3,7 @@ package com.artcart.services.impl;
 import com.artcart.exception.ResourceNotFoundException;
 import com.artcart.model.Customer;
 import com.artcart.model.Product;
+import com.artcart.model.ProductsBelongsToWishList;
 import com.artcart.model.WishList;
 import com.artcart.repository.CustomerRepo;
 import com.artcart.repository.ProductRepo;
@@ -46,16 +47,40 @@ public class WishListServiceImpl implements WishListService {
     }
 
     @Override
-    public void addProductToWishList(List<String> productId, String wishListId) {
-        WishList wishList = wishListRepo.findById(wishListId).orElseThrow(() -> new ResourceNotFoundException("wishlist not found with id" + wishListId));
-        productId.stream().forEach(i->{
-            Product product = productRepo.findById(i).orElseThrow(() -> new ResourceNotFoundException("product not found with id" + i));
-            if(!wishList.getProducts().contains(product))
-                wishList.getProducts().add(product);
-        });
+    public void addProductToWishList(List<String> productIds, String wishListId) {
+        // Find the wish list
+        WishList wishList = wishListRepo.findById(wishListId)
+                .orElseThrow(() -> new ResourceNotFoundException("Wishlist not found with id " + wishListId));
+
+        // Create a list to hold the new join entities
+        List<ProductsBelongsToWishList> newProductsBelongsToWishList = new ArrayList<>();
+
+        // Iterate over each product ID
+        for (String productId : productIds) {
+            // Find the product
+            Product product = productRepo.findById(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + productId));
+
+            // Check if the product is already in the wish list
+            boolean alreadyAdded = wishList.getProducts().stream()
+                    .anyMatch(p -> p.getProduct().equals(product));
+
+            if (!alreadyAdded) {
+                // Create a new ProductsBelongsToWishList instance
+                ProductsBelongsToWishList pbw = new ProductsBelongsToWishList();
+                pbw.setProduct(product);
+                pbw.setWishList(wishList);
+                newProductsBelongsToWishList.add(pbw);
+            }
+        }
+
+        // Add new join entities to the wish list
+        if (!newProductsBelongsToWishList.isEmpty()) {
+            wishList.getProducts().addAll(newProductsBelongsToWishList);
+        }
+
+        // Save the updated wish list
         wishListRepo.save(wishList);
-
-
     }
 
     @Override

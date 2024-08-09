@@ -9,5 +9,5 @@ public interface SellerService {
     SellerDto getSellerByEmail(String email);
     SellerDto updateProfile(SellerDto sellerDto);
 
-    void acceptOrder(AccecptOrderReq accecptOrderReq,Integer sellerId);
+    void acceptOrder(AccecptOrderReq accecptOrderReq,String sellerId);
 }

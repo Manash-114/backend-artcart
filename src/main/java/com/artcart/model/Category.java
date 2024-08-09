@@ -11,15 +11,13 @@ import lombok.ToString;
 import java.util.List;
 
 @Entity
-@Table(name = "category_table")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private String id;
     private String name;
     @OneToMany(mappedBy = "category")
     @JsonBackReference

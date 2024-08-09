@@ -11,8 +11,8 @@ public interface OrderService {
     void createOrder(String customerId , OrderReq orderReq);
     List<CustomerUnDeliveredOrderRes>  getAllOrdersOfCustomer(String customerId);
     List<CustomerUnDeliveredOrderRes>  getAllUnDeliveredOrderOfCustomer(String customerId);
-    List<SellerOrderRes> getAllOrderOfSeller(Integer sellerId);
-    List<SellerOrderRes>  getAllNewOrderOfSeller(Integer sellerId);
+    List<SellerOrderRes> getAllOrderOfSeller(String sellerId);
+    List<SellerOrderRes>  getAllNewOrderOfSeller(String sellerId);
 
     void modifyOrder(String orderId,OrderReq newOrderReq);
 

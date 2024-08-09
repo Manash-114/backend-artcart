@@ -92,6 +92,7 @@ public class CartServiceImpl implements CartService {
             Set<ProductBelongsToCart> collect = cart.getProductBelongsToCart().stream().filter((i) -> i.getProduct().getId().compareTo(p.getProductId()) == 0).collect(Collectors.toSet());
             if(collect.size() == 0) {
                 ProductBelongsToCart productBelongsToCart = new ProductBelongsToCart();
+                productBelongsToCart.setId(UUID.randomUUID().toString());
                 productBelongsToCart.setProduct(product);
                 productBelongsToCart.setCart(cart);
                 productBelongsToCart.setProductQuantity(p.getQuantity());

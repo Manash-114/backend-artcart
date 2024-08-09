@@ -17,29 +17,20 @@ import java.util.function.Supplier;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "order_table")
-
-
 public class Order {
     @Id
-    private String orderId;
+    private String id;
     private LocalDateTime orderDate;
     @OneToOne(cascade = CascadeType.ALL)
-
-
     @JsonManagedReference
     private BillingAddress billingAddress;
-
-
     @JsonManagedReference
     @OneToMany(mappedBy = "orders",cascade = CascadeType.ALL)
     private List<ProductBelongsToOrder> products;
 
 
-    @JsonManagedReference
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "order_manage_by_seller")
-    private List<Seller> sellers;
-
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderBelongsToSeller> sellers; // Updated field
 
     @OneToOne(cascade = CascadeType.ALL)
     private Payment payment;

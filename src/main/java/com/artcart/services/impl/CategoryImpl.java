@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -25,6 +26,7 @@ public class CategoryImpl implements CategoryService {
     @Override
     public CategoryDto addNewCategory(CategoryDto categoryDto) {
         Category ca = modelMapper.map(categoryDto, Category.class);
+        ca.setId(UUID.randomUUID().toString());
         System.out.println(ca);
         Category save = categoryRepo.save(ca);
         return modelMapper.map(save,CategoryDto.class);

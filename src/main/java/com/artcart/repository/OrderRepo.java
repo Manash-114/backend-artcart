@@ -14,9 +14,9 @@ public interface OrderRepo extends JpaRepository<Order,String> {
     List<Order> findByStatus(String status);
 
     @Query("select o from Order o join o.sellers s where s.id=:sellerId")
-    List<Order> findNewOrderBySellerId(@Param("sellerId") Integer sellerId);
+    List<Order> findNewOrderBySellerId(@Param("sellerId") String sellerId);
     @Query("select o from Order o join o.sellers s where s.id=:sellerId")
-    List<Order> findAllOrderBySellerId(@Param("sellerId") Integer sellerId);
+    List<Order> findAllOrderBySellerId(@Param("sellerId") String sellerId);
     List<Order> findByCustomer(Customer customer);
 
 }

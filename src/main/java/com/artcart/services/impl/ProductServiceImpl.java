@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void addProduct(ProductAddRequest productReqDto , Integer sellerId) {
+    public void addProduct(ProductAddRequest productReqDto , String sellerId) {
         //find category
         CategoryDto singleCategory = categoryService.getSingleCategory(productReqDto.getCategory());
        //find Seller
@@ -105,7 +105,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResDto> getAllProductOfSeller(Integer sellerId) {
+    public List<ProductResDto> getAllProductOfSeller(String sellerId) {
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("Seller not found with id " + sellerId));
         List<Product> bySeller = productRepo.findBySeller(seller);
         List<ProductResDto> collect = bySeller.stream().map((product -> modelMapper.map(product, ProductResDto.class))).collect(Collectors.toList());

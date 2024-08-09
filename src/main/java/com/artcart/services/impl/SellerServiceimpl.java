@@ -63,7 +63,7 @@ public class SellerServiceimpl implements SellerService {
     }
 
     @Override
-    public void acceptOrder(AccecptOrderReq accecptOrderReq,Integer sellerId) {
+    public void acceptOrder(AccecptOrderReq accecptOrderReq,String sellerId) {
 
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("seller not found with id +" + sellerId));
 

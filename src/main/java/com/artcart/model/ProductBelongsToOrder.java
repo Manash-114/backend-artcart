@@ -14,7 +14,6 @@ import java.util.List;
 @Entity
 @Setter
 @Getter
-@Table(name = "product_belongs_to_order")
 public class ProductBelongsToOrder {
     @Id
     private String id;

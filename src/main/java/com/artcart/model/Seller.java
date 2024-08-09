@@ -15,11 +15,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "seller_table")
 public class Seller {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private String id;
     private String name;
     private String email;
     private String profileImage;
@@ -33,4 +31,7 @@ public class Seller {
     @JsonBackReference
     @OneToMany(mappedBy = "seller")
     private List<Product> products;
+
+    @OneToMany(mappedBy = "seller")
+    private List<OrderBelongsToSeller> orders; // Updated field
 }

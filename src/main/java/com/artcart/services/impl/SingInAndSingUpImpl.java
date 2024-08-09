@@ -50,12 +50,14 @@ public class SingInAndSingUpImpl implements SingInAndSingUpService {
             return null;
         }
         SingInAndSingUp singInAndSingUp = new SingInAndSingUp();
+        singInAndSingUp.setId(UUID.randomUUID().toString());
         singInAndSingUp.setEmail(signUpRequest.getEmail());
         singInAndSingUp.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         singInAndSingUp.setRole("ROLE_"+signUpRequest.getRole().toUpperCase());
 
         if(singInAndSingUp.getRole().compareTo("ROLE_SELLER")==0){
             Seller seller = new Seller();
+            seller.setId(UUID.randomUUID().toString());
             seller.setEmail(singInAndSingUp.getEmail());
             seller.setRegDate(LocalDateTime.now());
             sellerRepo.save(seller);
@@ -71,6 +73,7 @@ public class SingInAndSingUpImpl implements SingInAndSingUpService {
             admin.setEmail(singInAndSingUp.getEmail());
             adminRepo.save(admin);
         }
+
         return singInAndSingUpRepo.save(singInAndSingUp);
     }
 

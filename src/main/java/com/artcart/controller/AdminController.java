@@ -80,7 +80,7 @@ public class AdminController {
 
     @PutMapping("/approve-seller/{sellerId}/{approvedStatus}")
     @Operation(summary = "To approve seller")
-    public ResponseEntity<Map<String, String>> handlerForApprovedSingleSeller(@PathVariable Integer sellerId,@PathVariable Integer approvedStatus){
+    public ResponseEntity<Map<String, String>> handlerForApprovedSingleSeller(@PathVariable String sellerId,@PathVariable Integer approvedStatus){
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new UserNotFound("seller not found with id " + sellerId));
         if(approvedStatus==1)
             seller.setApproved(true);

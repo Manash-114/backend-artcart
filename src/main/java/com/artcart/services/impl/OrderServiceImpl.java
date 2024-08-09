@@ -52,46 +52,52 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void createOrder(String customerId , OrderReq orderReq) {
 
-        Customer customer = customerRepo.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("customer not found with id" + customerId));
+        // Find customer
+        Customer customer = customerRepo.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + customerId));
 
-        //find address
-        Address address = addressRepo.findById(orderReq.getBillingAddress().getAddressId()).orElseThrow(() -> new ResourceNotFoundException("address not found with id " + orderReq.getBillingAddress().getAddressId()));
+        // Find address
+        Address address = addressRepo.findById(orderReq.getBillingAddress().getAddressId())
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id " + orderReq.getBillingAddress().getAddressId()));
+
+        // Create and set payment details
         Payment payment = new Payment();
-        if(orderReq.getPaymentReq().getId().compareTo("0")==0){
+        if (orderReq.getPaymentReq().getId().compareTo("0") == 0) {
             payment.setId(UUID.randomUUID().toString());
-        }else{
+        } else {
             payment.setId(orderReq.getPaymentReq().getId());
         }
-
         payment.setMode(orderReq.getPaymentReq().getMode());
         payment.setAmount(orderReq.getPaymentReq().getAmount());
         payment.setCustomer(customer);
         payment.setDate(LocalDateTime.now());
 
+        // Create and set order details
         Order order = new Order();
-//        order.setOrderId(orderReq.getOrderId());
-        order.setOrderId(UUID.randomUUID().toString());
+        order.setId(UUID.randomUUID().toString());
         order.setPayment(payment);
-        payment.setOrder(order);
-
+        payment.setOrder(order);  // Set bidirectional relationship
 
         BillingAddress billingAddress = new BillingAddress();
         billingAddress.setId(UUID.randomUUID().toString());
         billingAddress.setCustomerName(orderReq.getBillingAddress().getCustomerName());
         billingAddress.setPhoneNumber(orderReq.getBillingAddress().getPhoneNumber());
         billingAddress.setAlternatePhoneNumber(orderReq.getBillingAddress().getAlternatePhoneNumber());
-//        billingAddress.setAddress(address);
         billingAddress.setAddress(address);
         order.setBillingAddress(billingAddress);
         order.setCustomer(customer);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus("CREATED");
 
+        // Process products and sellers
         List<ProductAddToCartReq> productAddToCartReqList = orderReq.getProducts();
         List<ProductBelongsToOrder> productBelongsToOrders = new ArrayList<>();
-        productAddToCartReqList.forEach((item)->{
+        List<Seller> sellerList = new ArrayList<>();
+
+        productAddToCartReqList.forEach(item -> {
             ProductBelongsToOrder p = new ProductBelongsToOrder();
-            Product product = productRepo.findById(item.getProductId()).orElseThrow(() -> new ResourceNotFoundException("product not found with id" + item.getProductId()));
+            Product product = productRepo.findById(item.getProductId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + item.getProductId()));
             p.setProducts(product);
             p.setOrders(order);
             p.setProductQuantity(item.getQuantity());
@@ -100,19 +106,30 @@ public class OrderServiceImpl implements OrderService {
             p.setId(UUID.randomUUID().toString());
             productBelongsToOrders.add(p);
 
-        });
-
-        List<Seller> sellerList = new ArrayList<>();
-        productBelongsToOrders.forEach((item)->{
-            Product products = item.getProducts();
-            Seller seller = sellerRepo.findByProducts(products);
-            if(!sellerList.contains(seller))
+            // Collect sellers
+            Seller seller = sellerRepo.findByProducts(product);
+            if (!sellerList.contains(seller)) {
                 sellerList.add(seller);
+            }
         });
 
+        // Save order and products
         order.setProducts(productBelongsToOrders);
-        order.setSellers(sellerList);
-        Order save = orderRepo.save(order);
+
+        // Save join entities for order and sellers
+        List<OrderBelongsToSeller> orderBelongsToSellers = new ArrayList<>();
+        sellerList.forEach(seller -> {
+            OrderBelongsToSeller obs = new OrderBelongsToSeller();
+            obs.setOrder(order);
+            obs.setSeller(seller);
+            orderBelongsToSellers.add(obs);
+        });
+
+        order.setSellers(orderBelongsToSellers);
+
+        // Save order entity
+        orderRepo.save(order);
+
 
     }
 
@@ -128,7 +145,7 @@ public class OrderServiceImpl implements OrderService {
             products.forEach((p)->{
                 if(p.getDeliveryStatus().compareTo("SHIPPED")==0){
                     CustomerUnDeliveredOrderRes customerOrderRes = new CustomerUnDeliveredOrderRes();
-                    customerOrderRes.setOrderId(o.getOrderId());
+                    customerOrderRes.setOrderId(o.getId());
                     customerOrderRes.setOrderDate(o.getOrderDate());
                     customerOrderRes.setAddress(o.getBillingAddress().getAddress());
                     customerOrderRes.setProductBelongsToOrder(p);
@@ -154,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
             products.forEach((p)->{
                 if(p.getDeliveryStatus().compareTo("NOTSHIPPED")==0){
                     CustomerUnDeliveredOrderRes customerOrderRes = new CustomerUnDeliveredOrderRes();
-                    customerOrderRes.setOrderId(o.getOrderId());
+                    customerOrderRes.setOrderId(o.getId());
                     customerOrderRes.setOrderDate(o.getOrderDate());
                     customerOrderRes.setAddress(o.getBillingAddress().getAddress());
                     customerOrderRes.setProductBelongsToOrder(p);
@@ -170,10 +187,11 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public List<SellerOrderRes> getAllNewOrderOfSeller(Integer sellerId) {
+    public List<SellerOrderRes> getAllNewOrderOfSeller(String sellerId) {
 
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("seller not found with id" + sellerId));
         List<Order> orderBySellerId = orderRepo.findNewOrderBySellerId(seller.getId());
+
         List<SellerOrderRes> resData = new ArrayList<>();
         orderBySellerId.forEach((o)->{
             List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrdersAndDeliveryStatus(o,"NOTSHIPPED");
@@ -184,7 +202,7 @@ public class OrderServiceImpl implements OrderService {
                     sellerOrderRes.setProductsBelongsToOrder(productAccordingToSeller);
                     sellerOrderRes.setBillingAddress(o.getBillingAddress());
                     sellerOrderRes.setAddress(o.getBillingAddress().getAddress());
-                    sellerOrderRes.setOrderId(o.getOrderId());
+                    sellerOrderRes.setOrderId(o.getId());
                     ProductBelongsToOrder map = modelMapper.map(p, ProductBelongsToOrder.class);
                     productAccordingToSeller.add(map);
                     resData.add(sellerOrderRes);
@@ -197,14 +215,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<SellerOrderRes>  getAllOrderOfSeller(Integer sellerId) {
+    public List<SellerOrderRes>  getAllOrderOfSeller(String sellerId) {
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("seller not found with id" + sellerId));
         List<Order> orderBySellerId = orderRepo.findAllOrderBySellerId(seller.getId());
         List<SellerOrderRes> resData = new ArrayList<>();
 
         orderBySellerId.forEach((o)->{
             SellerOrderRes sellerOrderRes = new SellerOrderRes();
-            sellerOrderRes.setOrderId(o.getOrderId());
+            sellerOrderRes.setOrderId(o.getId());
             List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrders(o);
             List<ProductBelongsToOrder> productAccordingToSeller = new ArrayList<>();
             byOrders.forEach((p)->{

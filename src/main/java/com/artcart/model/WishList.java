@@ -16,7 +16,11 @@ public class WishList {
     @ManyToOne
     private Customer customer;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "product_belongs_to_wishList")
-    private List<Product> products;
+//    @ManyToMany(cascade = CascadeType.ALL)
+//    @JoinTable(name = "product_belongs_to_wishList")
+//    private List<Product> products;
+
+
+    @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL)
+    private List<ProductsBelongsToWishList> products; // Updated field
 }
