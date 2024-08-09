@@ -2,9 +2,9 @@ server:
   port: 9090
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/artcart_db
-    username: admin
-    password: root
+    url: jdbc:mysql://mysql.railway.internal:3306/railway
+    username: root
+    password: aggQGYrpYmgWFvbddQYhTbjISahVUtBr
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
