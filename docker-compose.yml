@@ -21,3 +21,5 @@ services:
       MYSQL_DATABASE: artcartdb1
       MYSQL_USER: admin
       MYSQL_PASSWORD: root
+
+#no need
