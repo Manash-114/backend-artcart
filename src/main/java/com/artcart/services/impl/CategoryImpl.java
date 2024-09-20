@@ -33,14 +33,14 @@ public class CategoryImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDto updateCategory(Integer cId, CategoryDto newCategoryDto) {
+    public CategoryDto updateCategory(String cId, CategoryDto newCategoryDto) {
         Category category = categoryRepo.findById(cId).orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + cId));
         category.setName(newCategoryDto.getName());
         return modelMapper.map(categoryRepo.save(category),CategoryDto.class);
     }
 
     @Override
-    public void deleteCategory(Integer cId) {
+    public void deleteCategory(String cId) {
         Category category = categoryRepo.findById(cId).orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + cId));
         categoryRepo.delete(category);
     }
@@ -52,7 +52,7 @@ public class CategoryImpl implements CategoryService {
         return  res;
     }
     @Override
-    public CategoryDto getSingleCategory(Integer cId){
+    public CategoryDto getSingleCategory(String cId){
         return  modelMapper.map(categoryRepo.findById(cId).orElseThrow(()->new ResourceNotFoundException("category not found with id "+cId)),CategoryDto.class);
     }
 

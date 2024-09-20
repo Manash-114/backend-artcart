@@ -123,7 +123,7 @@ public class AdminController {
 
     @GetMapping("/category/{id}")
     @Operation(summary = "to get single category details")
-    public ResponseEntity<CategoryDto> getSingleCategory(@PathVariable Integer id){
+    public ResponseEntity<CategoryDto> getSingleCategory(@PathVariable String id){
         CategoryDto res = categoryService.getSingleCategory(id);
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
@@ -131,7 +131,7 @@ public class AdminController {
 
     @DeleteMapping("/category/{id}")
     @Operation(summary = "to delete a category")
-    public ResponseEntity<?> deleteCategory(@PathVariable Integer id){
+    public ResponseEntity<?> deleteCategory(@PathVariable String id){
         categoryService.deleteCategory(id);
         Map<String,String> res = new HashMap<>();
         res.put("message","Deleted successfully");
@@ -140,7 +140,7 @@ public class AdminController {
 
     @PutMapping("/category/{id}")
     @Operation(summary = "to update a category")
-    public ResponseEntity<?> updateCategory(@PathVariable Integer id , @RequestBody CategoryDto newCategory){
+    public ResponseEntity<?> updateCategory(@PathVariable String id , @RequestBody CategoryDto newCategory){
         CategoryDto categoryDto = categoryService.updateCategory(id, newCategory);
         Map<String,Object> res = new HashMap<>();
         res.put("message","updated successfully");

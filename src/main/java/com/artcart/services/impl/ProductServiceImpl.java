@@ -1,6 +1,7 @@
 package com.artcart.services.impl;
 
 import com.artcart.exception.ResourceNotFoundException;
+import com.artcart.mapper.ProductMapper;
 import com.artcart.model.Category;
 import com.artcart.model.Product;
 import com.artcart.model.ProductImage;
@@ -15,6 +16,7 @@ import com.artcart.response.ProductResDto;
 import com.artcart.services.CategoryService;
 import com.artcart.services.ProductService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,6 +32,9 @@ public class ProductServiceImpl implements ProductService {
     private ProductImageRepo productImageRepo;
     private CategoryService categoryService;
     private SellerRepo sellerRepo;
+
+    @Autowired
+    private ProductMapper productMapper;
 
     public ProductServiceImpl(ModelMapper modelMapper, ProductRepo productRepo, ProductImageRepo productImageRepo, CategoryService categoryService, SellerRepo sellerRepo) {
         this.modelMapper = modelMapper;
@@ -88,7 +93,7 @@ public class ProductServiceImpl implements ProductService {
 
         all.forEach((p)->{
             if(p.isStock()){
-                ProductResDto map = modelMapper.map(p, ProductResDto.class);
+                ProductResDto map = productMapper.toProductResDto(p);
                 collect1.add(map);
             }
         });
@@ -107,8 +112,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResDto> getAllProductOfSeller(String sellerId) {
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("Seller not found with id " + sellerId));
-        List<Product> bySeller = productRepo.findBySeller(seller);
-        List<ProductResDto> collect = bySeller.stream().map((product -> modelMapper.map(product, ProductResDto.class))).collect(Collectors.toList());
-        return collect;
+        List<Product> products = productRepo.findBySeller(seller);
+//       List<ProductResDto> collect = bySeller.stream().map((product -> modelMapper.map(product, ProductResDto.class))).collect(Collectors.toList());
+        List<ProductResDto> list = products.stream()
+                .map(p -> productMapper.toProductResDto(p))
+                .toList();
+
+//        products.forEach((p)->{
+//            System.out.println(p.getId());
+//        });
+
+        return list;
     }
 }

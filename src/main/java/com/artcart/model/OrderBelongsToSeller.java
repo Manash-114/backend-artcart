@@ -16,12 +16,11 @@ public class OrderBelongsToSeller {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // Primary key for the join table
-
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
-
     @ManyToOne
     @JoinColumn(name = "seller_id")
     private Seller seller;
+    private String status;
 }

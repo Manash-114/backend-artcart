@@ -11,7 +11,9 @@ import com.artcart.response.SellerOrderRes;
 import com.artcart.services.OrderService;
 import com.artcart.services.SellerService;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -37,6 +40,8 @@ public class OrderServiceImpl implements OrderService {
 
     private ProductBelongsToOrderRepo productBelongsToOrderRepo;
 
+    @Autowired
+    private OrderBelongsToSellerRepo orderBelongsToSellerRepo;
 
     public OrderServiceImpl(OrderRepo orderRepo, PaymentRepo paymentRepo, ModelMapper modelMapper, CustomerRepo customerRepo, AddressRepo addressRepo, ProductRepo productRepo, SellerRepo sellerRepo, ProductBelongsToOrderRepo productBelongsToOrderRepo) {
         this.orderRepo = orderRepo;
@@ -122,6 +127,7 @@ public class OrderServiceImpl implements OrderService {
             OrderBelongsToSeller obs = new OrderBelongsToSeller();
             obs.setOrder(order);
             obs.setSeller(seller);
+            obs.setStatus("CREATED");
             orderBelongsToSellers.add(obs);
         });
 
@@ -190,32 +196,38 @@ public class OrderServiceImpl implements OrderService {
     public List<SellerOrderRes> getAllNewOrderOfSeller(String sellerId) {
 
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("seller not found with id" + sellerId));
-        List<Order> orderBySellerId = orderRepo.findNewOrderBySellerId(seller.getId());
-
+        List<OrderBelongsToSeller> bySellerOrder = orderBelongsToSellerRepo.findBySellerWithCreated(seller);
         List<SellerOrderRes> resData = new ArrayList<>();
-        orderBySellerId.forEach((o)->{
-            List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrdersAndDeliveryStatus(o,"NOTSHIPPED");
+
+        System.out.println(bySellerOrder.size()+"size");
+
+        bySellerOrder.forEach((o)-> {
+            List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrdersAndDeliveryStatus(o.getOrder(), "NOTSHIPPED");
             List<ProductBelongsToOrder> productAccordingToSeller = new ArrayList<>();
-            byOrders.forEach((p)->{
-                SellerOrderRes sellerOrderRes = new SellerOrderRes();
-                if(p.getProducts().getSeller().getId() == sellerId) {
-                    sellerOrderRes.setProductsBelongsToOrder(productAccordingToSeller);
-                    sellerOrderRes.setBillingAddress(o.getBillingAddress());
-                    sellerOrderRes.setAddress(o.getBillingAddress().getAddress());
-                    sellerOrderRes.setOrderId(o.getId());
+            SellerOrderRes sellerOrderRes = new SellerOrderRes();
+            byOrders.forEach((p) -> {
+                if (p.getProducts().getSeller().getId().compareTo(sellerId) == 0) {
+                    sellerOrderRes.setBillingAddress(o.getOrder().getBillingAddress());
+                    sellerOrderRes.setAddress(o.getOrder().getBillingAddress().getAddress());
+                    sellerOrderRes.setOrderId(o.getOrder().getId());
                     ProductBelongsToOrder map = modelMapper.map(p, ProductBelongsToOrder.class);
                     productAccordingToSeller.add(map);
-                    resData.add(sellerOrderRes);
                 }
             });
+            sellerOrderRes.setProductsBelongsToOrder(productAccordingToSeller);
+            resData.add(sellerOrderRes);
+
         });
-    return resData;
+
+
+         return resData;
 
 
     }
 
     @Override
     public List<SellerOrderRes>  getAllOrderOfSeller(String sellerId) {
+        log.info("i am called all");
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("seller not found with id" + sellerId));
         List<Order> orderBySellerId = orderRepo.findAllOrderBySellerId(seller.getId());
         List<SellerOrderRes> resData = new ArrayList<>();

@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.art-cart</groupId>
     <artifactId>art-cart-backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>art-cart-backend</name>
     <description>art-cart-backend</description>
     <properties>

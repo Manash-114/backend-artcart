@@ -7,10 +7,10 @@ import java.util.List;
 
 public interface CategoryService {
     CategoryDto addNewCategory(CategoryDto categoryDto);
-    CategoryDto updateCategory(Integer cId, CategoryDto newCategoryDto);
-    void deleteCategory(Integer cid);
+    CategoryDto updateCategory(String cId, CategoryDto newCategoryDto);
+    void deleteCategory(String cid);
 
     List<CategoryDto> getAllCategory();
-    CategoryDto getSingleCategory(Integer cId);
+    CategoryDto getSingleCategory(String cId);
 
 }

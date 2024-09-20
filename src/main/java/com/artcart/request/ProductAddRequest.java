@@ -18,5 +18,5 @@ public class ProductAddRequest {
     private String description;
     private boolean stock;
     private List<String> productImages;
-    private Integer category;
+    private String category;
 }

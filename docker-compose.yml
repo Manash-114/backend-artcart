@@ -1,25 +1,44 @@
-version: '1.1'
-
 services:
-  app:
-    image: manash/artcart-back:1.0.0
-    ports:
-      - 9090:9090
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/artcartdb1?autoReconnect=true&allowPublicKeyRetrieval=true&&useSSL=false
-      SPRING_DATASOURCE_USERNAME: admin
-      SPRING_DATASOURCE_PASSWORD: root
-    depends_on:
-      - db
-
-  db:
+  mysql:
     image: mysql:8.0.27
+    container_name: mysql-container
+    networks:
+      - art-cart-network
     environment:
-      DATABASE_HOST: docker-mysql
-      DATABASE_PORT: 3306
+      MYSQL_DATABASE: artcartdb
+      MYSQL_USER: manash
+      MYSQL_PASSWORD: manash
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: artcartdb1
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: root
 
-#no need
+    ports:
+      - "3307:3306"
+
+  artcart-backend:
+    image: manash/artcart-backend
+    container_name: art-cart-container
+    restart: always
+    networks:
+      - art-cart-network
+    environment:
+      PROFILE: prod
+      MYSQL_HOST: mysql-container
+      DATABASE_NAME: artcartdb
+      MYSQL_USERNAME: manash
+      MYSQL_PASSWORD: manash
+    ports:
+      - "9090:9090"
+    depends_on:
+      - mysql
+  artcart-front-end:
+    image: manash/artcart-frontend
+    container_name: art-cart-frontend
+    depends_on:
+      - artcart-backend
+    ports:
+      - "8080:80"
+
+volumes:
+  artcartvolume:
+networks:
+  art-cart-network:
+    driver: bridge

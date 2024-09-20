@@ -32,6 +32,7 @@ public class Seller {
     @OneToMany(mappedBy = "seller")
     private List<Product> products;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "seller")
     private List<OrderBelongsToSeller> orders; // Updated field
 }
