@@ -22,8 +22,8 @@ public class JwtTokenProvider {
 //    private String jwtSecret = "yourSecretKey";
     private static final String SECRET = "jlkfdsdfalkdafjlajfkldjsfadlkjfdlkafjdaksfldkfldfdsakjfdafhdifohdfdsfhdsklfjdslffdsjfldfdfljfdsflkjfdsfdfjslkfj"; // At least 32 characters
     private SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)); // Ensure the key meets HS256 requirements
-    private int jwtExpirationMs = 1 * 15000;
-    private int refreshExpirationMs = 60000;
+    private int jwtExpirationMs = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+    private int refreshExpirationMs = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
 
     public String getEmailFromToken(String jwtToken) throws Exception{
         jwtToken = jwtToken.substring(7);
