@@ -9,6 +9,7 @@ import com.artcart.request.AccecptOrderReq;
 import com.artcart.request.ProductAddRequest;
 import com.artcart.request.ProductReqDto;
 import com.artcart.request.UpdateProductReq;
+import com.artcart.response.OrderResDto;
 import com.artcart.response.ProductResDto;
 import com.artcart.response.SellerDto;
 import com.artcart.response.SellerOrderRes;
@@ -70,7 +71,7 @@ public class SellerController {
         return new ResponseEntity<>(sellerByEmail,HttpStatus.OK);
     }
 
-    @PostMapping("/save")
+    @PutMapping("/save")
     @Operation(summary = "to save his profile ")
     public ResponseEntity<SellerDto> createHandler(@RequestParam("aadhaarImage")MultipartFile aadhaarImage,
                                                    @RequestParam("profileImage") MultipartFile profileImage,
@@ -86,14 +87,13 @@ public class SellerController {
         try{
             Map<Object, Object> cloudAadhaarImage = cloudinaryImageUpload.imageUpload(aadhaarImage);
             Map<Object, Object> cloudProfileImage = cloudinaryImageUpload.imageUpload(profileImage);
-
             SellerDto sellerDto = objectMapper.readValue(data, SellerDto.class);
             sellerDto.setId(byEmail.getId());
             sellerDto.setEmail(byEmail.getEmail());
             sellerDto.setAadhaarImage(cloudAadhaarImage.get("url").toString());
             sellerDto.setProfileImage(cloudProfileImage.get("url").toString());
             SellerDto sellerDto1 = sellerService.create(sellerDto);
-            return new ResponseEntity<>(sellerDto1, HttpStatus.CREATED);
+            return new ResponseEntity<>(sellerDto1, HttpStatus.OK);
         }catch (Exception e){
             throw new CloudinaryImageUploadException("file uploaded failed");
         }
@@ -110,7 +110,7 @@ public class SellerController {
         map.put("message","Product add successfully");
         return new ResponseEntity<>(map, HttpStatus.CREATED);
     }
-    @PostMapping("/update-product/{productId}")
+    @PutMapping("/update-product/{productId}")
     @Operation(summary = "to update  a  product")
     public ResponseEntity<?> updateProduct(@RequestHeader("Authorization") String token ,  @RequestBody UpdateProductReq productUpdateRequest,@PathVariable String productId) throws Exception{
         String sellerEmail = jwtTokenProvider.getEmailFromToken(token);
@@ -145,10 +145,11 @@ public class SellerController {
     public ResponseEntity<?> acceptOrder(@RequestHeader("Authorization") String token, @RequestBody AccecptOrderReq accecptOrderReq) throws Exception{
         String email = jwtTokenProvider.getEmailFromToken(token);
         SellerDto seller = sellerService.getSellerByEmail(email);
-        sellerService.acceptOrder(accecptOrderReq,seller.getId());
+        OrderResDto orderResDto = sellerService.acceptOrder(accecptOrderReq, seller.getId());
         Map<String,Object>  res = new HashMap<>();
         res.put("message","Order Accepted Successfully");
         res.put("status",HttpStatus.OK);
+        res.put("data",orderResDto);
         return new ResponseEntity<>(res, HttpStatus.OK);
 
     }

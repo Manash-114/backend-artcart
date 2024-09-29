@@ -5,6 +5,7 @@ import com.artcart.model.Customer;
 import com.artcart.request.OrderReq;
 import com.artcart.request.PaymentReq;
 import com.artcart.request.RazorpayPaymentReq;
+import com.artcart.response.OrderResDto;
 import com.artcart.response.SellerOrderRes;
 import com.artcart.services.CustomerService;
 import com.artcart.services.OrderService;
@@ -41,10 +42,11 @@ public class OrderController {
 
         String email = jwtTokenProvider.getEmailFromToken(token);
         Customer customer = customerService.getCustomerByEmail(email);
-        orderService.createOrder(customer.getId(),orderReq);
+        OrderResDto order = orderService.createOrder(customer.getId(), orderReq);
         Map<Object,Object> res = new HashMap<>();
         res.put("message","Order Created Successfully");
         res.put("status",HttpStatus.CREATED);
+        res.put("data",order);
         return new ResponseEntity<>(res, HttpStatus.CREATED);
 
     }

@@ -27,11 +27,8 @@ public class Order {
     @JsonManagedReference
     @OneToMany(mappedBy = "orders",cascade = CascadeType.ALL)
     private List<ProductBelongsToOrder> products;
-
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderBelongsToSeller> sellers; // Updated field
-
     @OneToOne(cascade = CascadeType.ALL)
     private Payment payment;
     @ManyToOne

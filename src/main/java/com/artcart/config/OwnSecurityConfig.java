@@ -59,11 +59,7 @@ public class OwnSecurityConfig {
 
                         return corsConfiguration;
                     }
-                })
-                .and()
-                .formLogin()
-                .and()
-                .httpBasic();
+                });
 
 
         return httpSecurity.build();

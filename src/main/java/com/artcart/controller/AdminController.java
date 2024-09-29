@@ -60,7 +60,6 @@ public class AdminController {
         return new ResponseEntity<>(adminDetais,HttpStatus.OK);
 
     }
-
     @GetMapping("/all-unapproved-seller")
     @Operation(summary = "Get All Unapproved seller details",
     responses = {

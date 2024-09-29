@@ -1,6 +1,7 @@
 package com.artcart.services;
 
 import com.artcart.request.AccecptOrderReq;
+import com.artcart.response.OrderResDto;
 import com.artcart.response.SellerDto;
 
 public interface SellerService {
@@ -9,5 +10,5 @@ public interface SellerService {
     SellerDto getSellerByEmail(String email);
     SellerDto updateProfile(SellerDto sellerDto);
 
-    void acceptOrder(AccecptOrderReq accecptOrderReq,String sellerId);
+    OrderResDto acceptOrder(AccecptOrderReq accecptOrderReq, String sellerId);
 }

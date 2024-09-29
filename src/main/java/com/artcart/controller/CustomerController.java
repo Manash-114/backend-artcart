@@ -76,4 +76,9 @@ public class CustomerController {
         return new ResponseEntity<>(allOrdersOfCustomer, HttpStatus.OK);
 
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<?> test(){
+        return new ResponseEntity<>(List.of("ABC","Shdt"),HttpStatus.OK);
+    }
 }

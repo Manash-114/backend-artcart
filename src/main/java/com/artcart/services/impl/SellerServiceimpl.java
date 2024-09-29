@@ -10,8 +10,10 @@ import com.artcart.repository.OrderRepo;
 import com.artcart.repository.ProductBelongsToOrderRepo;
 import com.artcart.repository.SellerRepo;
 import com.artcart.request.AccecptOrderReq;
+import com.artcart.response.OrderResDto;
 import com.artcart.response.SellerDto;
 import com.artcart.services.SellerService;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class SellerServiceimpl implements SellerService {
 
     private SellerRepo sellerRepo;
@@ -68,8 +71,8 @@ public class SellerServiceimpl implements SellerService {
     }
 
     @Override
-    public void acceptOrder(AccecptOrderReq accecptOrderReq,String sellerId) {
-
+    public OrderResDto acceptOrder(AccecptOrderReq accecptOrderReq,String sellerId) {
+        log.info(String.format("data %s",accecptOrderReq));
         Seller seller = sellerRepo.findById(sellerId).orElseThrow(() -> new ResourceNotFoundException("seller not found with id +" + sellerId));
         Order order = orderRepo.findById(accecptOrderReq.getOrderId()).orElseThrow(()-> new ResourceNotFoundException("order not found with id"+accecptOrderReq.getOrderId()));
         List<ProductBelongsToOrder> byOrders = productBelongsToOrderRepo.findByOrders(order);
@@ -84,6 +87,14 @@ public class SellerServiceimpl implements SellerService {
         });
         order.setProducts(collect);
         orderBelongsToSellerRepo.save(byOrder);
-        orderRepo.save(order);
+        Order save = orderRepo.save(order);
+
+        OrderResDto orderResDto =  OrderResDto
+                .builder()
+                .id(save.getId())
+                .orderDate(save.getOrderDate())
+                .build();
+        return orderResDto;
+
     }
 }

@@ -7,6 +7,7 @@ import com.artcart.request.OrderReq;
 import com.artcart.request.ProductAddToCartReq;
 import com.artcart.response.CustomerOrderRes;
 import com.artcart.response.CustomerUnDeliveredOrderRes;
+import com.artcart.response.OrderResDto;
 import com.artcart.response.SellerOrderRes;
 import com.artcart.services.OrderService;
 import com.artcart.services.SellerService;
@@ -55,8 +56,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void createOrder(String customerId , OrderReq orderReq) {
-
+    public OrderResDto createOrder(String customerId , OrderReq orderReq) {
         // Find customer
         Customer customer = customerRepo.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + customerId));
@@ -134,7 +134,15 @@ public class OrderServiceImpl implements OrderService {
         order.setSellers(orderBelongsToSellers);
 
         // Save order entity
-        orderRepo.save(order);
+        Order save = orderRepo.save(order);
+
+        OrderResDto orderResDto = OrderResDto.builder()
+                .id(save.getId())
+                .orderDate(save.getOrderDate())
+                .billingAddress(save.getBillingAddress())
+                .payment(save.getPayment())
+                .build();
+        return orderResDto;
 
 
     }
@@ -142,6 +150,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<CustomerUnDeliveredOrderRes> getAllOrdersOfCustomer(String customerId) {
 
+        log.info(String.format("customer id %s",customerId));
         Customer customer = customerRepo.findById(customerId).orElseThrow(() -> new ResourceNotFoundException("customer not found with id" + customerId));
         List<Order> byCustomer = orderRepo.findByCustomer(customer);
         List<CustomerUnDeliveredOrderRes> customerOrderResList = new ArrayList<>();
@@ -161,8 +170,7 @@ public class OrderServiceImpl implements OrderService {
 
             });
         });
-
-
+        log.info(String.format("data of order %s",customerOrderResList));
         return customerOrderResList;
     }
 
